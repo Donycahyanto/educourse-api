@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const CourseController = require('../controllers/courseController');
+const courseController = require('../controllers/courseController');
+const { verifyToken } = require('../middlewares/authMiddleware');
 
-router.get('/', CourseController.getAll);
-router.get('/:id', CourseController.getById);
-router.post('/', CourseController.create);
-router.patch('/:id', CourseController.update);
-router.put('/:id', CourseController.update);
-router.delete('/:id', CourseController.delete);
+// Endpoint CRUD Course (Bisa diproteksi menggunakan verifyToken)
+router.get('/courses', courseController.getCourses);
+router.get('/courses/:id', courseController.getCourseById);
+router.post('/courses', verifyToken, courseController.addCourse);
+router.patch('/courses/:id', verifyToken, courseController.updateCourse);
+router.delete('/courses/:id', verifyToken, courseController.deleteCourse);
 
 module.exports = router;

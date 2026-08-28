@@ -1,25 +1,24 @@
-const mysql = require('mysql2');
+const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-const db = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'educourse_db',
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
-
-// Cek koneksi saat server dinyalakan
-db.getConnection((err, connection) => {
-  if (err) {
-    console.error('❌ Koneksi Database Gagal:', err.message);
-  } else {
-    console.log('✅ Berhasil terhubung ke Database MySQL');
-    connection.release();
+const sequelize = new Sequelize(
+  process.env.DB_NAME || 'educourse_db',
+  process.env.DB_USER || 'root',
+  process.env.DB_PASSWORD || '',
+  {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    dialect: 'mysql',
+    logging: false,
   }
-});
+);
 
-module.exports = db.promise(); // Menggunakan versi Promise agar async/await lebih bersih
+// Cek koneksi ke database saat aplikasi dijalankan
+sequelize
+  .authenticate()
+  .then(() =>
+    console.log('✅ Berhasil terhubung ke Database MySQL via Sequelize')
+  )
+  .catch((err) => console.error('❌ Koneksi Database Gagal:', err.message));
+
+module.exports = sequelize;
